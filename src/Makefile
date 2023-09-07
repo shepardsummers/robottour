@@ -99,7 +99,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_robottour_OBJECTS = main.$(OBJEXT) board.$(OBJEXT)
+am_robottour_OBJECTS = main.$(OBJEXT) board.$(OBJEXT) gui.$(OBJEXT)
 robottour_OBJECTS = $(am_robottour_OBJECTS)
 robottour_LDADD = $(LDADD)
 robottour_LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(robottour_LDFLAGS) \
@@ -119,7 +119,8 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I. -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/board.Po ./$(DEPDIR)/main.Po
+am__depfiles_remade = ./$(DEPDIR)/board.Po ./$(DEPDIR)/gui.Po \
+	./$(DEPDIR)/main.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -159,12 +160,12 @@ am__define_uniq_tagged_files = \
   done | $(am__uniquify_input)`
 am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/depcomp
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} '/home/henry/Documents/c/robottour/missing' aclocal-1.16
+ACLOCAL = ${SHELL} '/home/henry/Documents/robottour/missing' aclocal-1.16
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} '/home/henry/Documents/c/robottour/missing' autoconf
-AUTOHEADER = ${SHELL} '/home/henry/Documents/c/robottour/missing' autoheader
-AUTOMAKE = ${SHELL} '/home/henry/Documents/c/robottour/missing' automake-1.16
+AUTOCONF = ${SHELL} '/home/henry/Documents/robottour/missing' autoconf
+AUTOHEADER = ${SHELL} '/home/henry/Documents/robottour/missing' autoheader
+AUTOMAKE = ${SHELL} '/home/henry/Documents/robottour/missing' automake-1.16
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -189,7 +190,7 @@ LDFLAGS =
 LIBOBJS = 
 LIBS = 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} '/home/henry/Documents/c/robottour/missing' makeinfo
+MAKEINFO = ${SHELL} '/home/henry/Documents/robottour/missing' makeinfo
 MKDIR_P = /usr/bin/mkdir -p
 OBJEXT = o
 PACKAGE = robottour
@@ -204,10 +205,10 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = 
 VERSION = 1.0
-abs_builddir = /home/henry/Documents/c/robottour/src
-abs_srcdir = /home/henry/Documents/c/robottour/src
-abs_top_builddir = /home/henry/Documents/c/robottour
-abs_top_srcdir = /home/henry/Documents/c/robottour
+abs_builddir = /home/henry/Documents/robottour/src
+abs_srcdir = /home/henry/Documents/robottour/src
+abs_top_builddir = /home/henry/Documents/robottour
+abs_top_srcdir = /home/henry/Documents/robottour
 ac_ct_CC = gcc
 am__include = include
 am__leading_dot = .
@@ -226,7 +227,7 @@ host_alias =
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/henry/Documents/c/robottour/install-sh
+install_sh = ${SHELL} /home/henry/Documents/robottour/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -247,8 +248,8 @@ target_alias =
 top_build_prefix = ../
 top_builddir = ..
 top_srcdir = ..
-robottour_SOURCES = main.c board.c board.h
-robottour_LDFLAGS = -lm
+robottour_SOURCES = main.c board.c robot.h gui.c
+robottour_LDFLAGS = -L/usr/local/lib -Wl,-rpath,/usr/local/lib -Wl,--enable-new-dtags -lSDL2 -lm
 all: all-am
 
 .SUFFIXES:
@@ -336,6 +337,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 include ./$(DEPDIR)/board.Po # am--include-marker
+include ./$(DEPDIR)/gui.Po # am--include-marker
 include ./$(DEPDIR)/main.Po # am--include-marker
 
 $(am__depfiles_remade):
@@ -485,6 +487,7 @@ clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
 
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/board.Po
+	-rm -f ./$(DEPDIR)/gui.Po
 	-rm -f ./$(DEPDIR)/main.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
@@ -532,6 +535,7 @@ installcheck-am:
 
 maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/board.Po
+	-rm -f ./$(DEPDIR)/gui.Po
 	-rm -f ./$(DEPDIR)/main.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic

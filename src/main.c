@@ -1,25 +1,24 @@
 #include <stdio.h>
-#include "board.h"
+#include "robot.h"
 
 int main() {
-    Barrier barriers[] = {
-        {1, 2},
-        {3, 1},
-        {3, 3},
-        {4, 0},
-        {4, 2},
-        {5, 2},
-        {6, 0},
-        {7, 3},
-    };
-    Gate gates[] = {
-        {0, 1},
-        {2, 3},
-        {3, 1},
-    };
-    Board board;
-    board.barriers = barriers;
-    board.gates = gates;
-    printboard(&board);
+    Board *board = newboard();
+    SDL_Context *ctx = SDL_InitContext();
+
+    int barrierlist[] = {6, 7, 10, 18, 20, 24, 28, 30};
+    addbarriers(board->barriers, barrierlist, NUMBARRIERS);
+    int gateslist[] = {2, 8, 11};
+    addgates(board->gates, gateslist, NUMGATES);
+
+    render(ctx, board);
+    SDL_Event event;
+    while (SDL_WaitEvent(&event)) {
+        switch (event.type) {
+            case SDL_QUIT:
+                cleanup(ctx);
+                break;
+        }
+        render(ctx, board);
+    }
 }
 

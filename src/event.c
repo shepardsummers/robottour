@@ -51,6 +51,12 @@ void handleevent(SDL_Context *ctx, State *state, SDL_Event *event) {
                     case GATE:
                         gateclick(ctx, state);
                         break;
+                    case TARGET:
+                        targetclick(ctx, state);
+                        break;
+                    case START:
+                        startclick(ctx, state);
+                        break;
                     default:
                         break;
                 }

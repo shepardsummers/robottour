@@ -3,12 +3,14 @@
 #define NUMBARRIERS    8
 #define NUMGATES   3
 
-#define SQUARESIZE 128
+#define SQUARESIZE 256
 #define BORDERSIZE 8
 #define WIDTH 4
 #define HEIGHT 4
 #define WINWIDTH ((WIDTH * SQUARESIZE) + (BORDERSIZE * 2))
 #define WINHEIGHT (HEIGHT * SQUARESIZE + (BORDERSIZE * 2))
+#define BOARDWIDTH WIDTH * SQUARESIZE
+#define BOARDHEIGHT HEIGHT * SQUARESIZE
 
 typedef struct {
     SDL_Window *window;
@@ -22,6 +24,7 @@ typedef struct {
     long long *barriers;
     short *gates;
     int target;
+    int start;
 } Board;
 
 typedef enum {
@@ -50,6 +53,7 @@ void removebarrier(long long *barriers, int i);
 int barrierexists(long long *barriers, int i);
 int getclosestbarrier(SDL_Point *mousepos, Board *board);
 int getclosestsquare(SDL_Point *mousepos, Board *board);
+int getclosestedge(SDL_Point *mousepos, Board *board);
 
 SDL_Context *SDL_InitContext();
 void cleanup(SDL_Context *ctx);
@@ -58,9 +62,13 @@ int needsupdate(Uint32 lastupdate);
 void renderbarrier(SDL_Context *ctx, int i);
 void rendergate(SDL_Context *ctx, int i);
 void rendertarget(SDL_Context *ctx, int target);
+void renderstart(SDL_Context *ctx, int start);
 
 void handleevents(SDL_Context *ctx, State *state);
 
 void handlemode(SDL_Context *ctx, State *state);
 void barrierclick(SDL_Context *ctx, State *state);
 void gateclick(SDL_Context *ctx, State *state);
+void targetclick(SDL_Context *ctx, State *state);
+void startclick(SDL_Context *ctx, State *state);
+

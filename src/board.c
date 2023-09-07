@@ -13,6 +13,7 @@ Board *newboard() {
     board->barriers = malloc(sizeof(long long));
     board->gates = malloc(sizeof(short));
     board->target = 1;
+    board->start = 37;
 
     *board->barriers &= 0;
     *board->gates &= 0;
@@ -91,3 +92,35 @@ int getclosestsquare(SDL_Point *mousepos, Board *board) {
     gate += (mousepos->y / SQUARESIZE) * WIDTH;
     return gate;
 }
+
+int getclosestedge(SDL_Point *mousepos, Board *board) {
+    int x, y;
+    x = mousepos->x;
+    y = mousepos->y;
+
+    int distances[] = {y, BOARDHEIGHT - y, x, BOARDWIDTH - x};
+    int min = distances[0];
+    Direction dir = TOP;
+    int i;
+    for (i = 1; i < 4; i++) {
+        if (distances[i] < min) {
+            min = distances[i];
+            dir = i;
+        }
+    }
+    switch (dir) {
+        case TOP:
+            return x / SQUARESIZE;
+            break;
+        case BOTTOM:
+            return (x / SQUARESIZE) + (HEIGHT * 9);
+            break;
+        case LEFT:
+            return 4 + ((y / SQUARESIZE) * 9);
+            break;
+        case RIGHT:
+            return 8 + ((y / SQUARESIZE) * 9);
+            break;
+    }
+}
+

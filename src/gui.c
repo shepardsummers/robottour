@@ -2,13 +2,12 @@
 
 #define FPS 60
 
-#define BOARDWIDTH WIDTH * SQUARESIZE
-#define BOARDHEIGHT HEIGHT * SQUARESIZE
-
 #define BARRIERTHICKNESS (SQUARESIZE / 16)
 #define BARRIEROFFSET (SQUARESIZE / 16)
 #define BARRIERLENGTH (SQUARESIZE - (BARRIEROFFSET * 2))
 #define GATETHICKNESS (BARRIERTHICKNESS / 2 + (SQUARESIZE / 64))
+
+#define POINTSIZE (SQUARESIZE / 16)
 
 void updatetexture(SDL_Context *ctx, State *state);
 void rendergrid(SDL_Context *ctx);
@@ -16,6 +15,7 @@ void renderbarriers(SDL_Context *ctx, long long *barriers);
 void rendergates(SDL_Context *ctx, short *gates);
 void rendercircle(SDL_Renderer *renderer, int x0, int y0, int radius);
 void rendertarget(SDL_Context *ctx, int target);
+void renderstart(SDL_Context *ctx, int start);
 
 SDL_Context *SDL_InitContext() {
     SDL_Context *ctx = malloc(sizeof(SDL_Context));
@@ -64,6 +64,7 @@ void updatetexture(SDL_Context *ctx, State *state) {
     rendergates(ctx, state->board->gates);
     renderbarriers(ctx, state->board->barriers);
     rendertarget(ctx, state->board->target);
+    renderstart(ctx, state->board->start);
     handlemode(ctx, state);
 }
 
@@ -127,11 +128,30 @@ void renderbarrier(SDL_Context *ctx, int i) {
 }
 
 void rendertarget(SDL_Context *ctx, int target) {
+    if (target < 0)
+        return;
+    SDL_SetRenderDrawColor(ctx->renderer, 0xFF, 0x00, 0x00, 0xFF);
+    SDL_SetRenderTarget(ctx->renderer, ctx->texture);
+    rendercircle(ctx->renderer,
+                 (target % WIDTH) * SQUARESIZE + (SQUARESIZE / 2),
+                 (target / WIDTH) * SQUARESIZE + (SQUARESIZE / 2), POINTSIZE);
+}
+
+void renderstart(SDL_Context *ctx, int start) {
+    if (start < 0)
+        return;
     SDL_SetRenderDrawColor(ctx->renderer, 0x00, 0xFF, 0x00, 0xFF);
     SDL_SetRenderTarget(ctx->renderer, ctx->texture);
-    rendercircle(ctx->renderer, (target % WIDTH) * SQUARESIZE + (SQUARESIZE / 2),
-                 (target / WIDTH) * SQUARESIZE + (SQUARESIZE / 2),
-                 (SQUARESIZE / 16));
+    int x, y, horiz;
+    horiz = (start % 9) < 4;
+    if (horiz) {
+        x = (start % 9) * SQUARESIZE + (SQUARESIZE / 2);
+        y = (start / 9) * SQUARESIZE;
+    } else {
+        x = (((start % 9) - 4) % 5) * SQUARESIZE;
+        y = (start / 9) * SQUARESIZE + (SQUARESIZE / 2);
+    }
+    rendercircle(ctx->renderer, x, y, POINTSIZE);
 }
 
 void rendercircle(SDL_Renderer *renderer, int x0, int y0, int radius) {

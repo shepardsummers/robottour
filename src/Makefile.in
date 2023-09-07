@@ -99,7 +99,8 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_robottour_OBJECTS = main.$(OBJEXT) board.$(OBJEXT) gui.$(OBJEXT)
+am_robottour_OBJECTS = main.$(OBJEXT) board.$(OBJEXT) gui.$(OBJEXT) \
+	event.$(OBJEXT) modes.$(OBJEXT)
 robottour_OBJECTS = $(am_robottour_OBJECTS)
 robottour_LDADD = $(LDADD)
 robottour_LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(robottour_LDFLAGS) \
@@ -119,8 +120,8 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/board.Po ./$(DEPDIR)/gui.Po \
-	./$(DEPDIR)/main.Po
+am__depfiles_remade = ./$(DEPDIR)/board.Po ./$(DEPDIR)/event.Po \
+	./$(DEPDIR)/gui.Po ./$(DEPDIR)/main.Po ./$(DEPDIR)/modes.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -248,7 +249,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-robottour_SOURCES = main.c board.c robot.h gui.c
+robottour_SOURCES = main.c board.c robot.h gui.c event.c modes.c
 robottour_LDFLAGS = -L/usr/local/lib -Wl,-rpath,/usr/local/lib -Wl,--enable-new-dtags -lSDL2 -lm
 all: all-am
 
@@ -337,8 +338,10 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/board.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gui.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modes.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -487,8 +490,10 @@ clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
 
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/board.Po
+	-rm -f ./$(DEPDIR)/event.Po
 	-rm -f ./$(DEPDIR)/gui.Po
 	-rm -f ./$(DEPDIR)/main.Po
+	-rm -f ./$(DEPDIR)/modes.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -535,8 +540,10 @@ installcheck-am:
 
 maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/board.Po
+	-rm -f ./$(DEPDIR)/event.Po
 	-rm -f ./$(DEPDIR)/gui.Po
 	-rm -f ./$(DEPDIR)/main.Po
+	-rm -f ./$(DEPDIR)/modes.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

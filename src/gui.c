@@ -1,11 +1,6 @@
 #include "robot.h"
 
-#define SQUARESIZE 256
-#define BORDERSIZE 8
-#define WIDTH 4
-#define HEIGHT 4
-#define WINWIDTH ((WIDTH * SQUARESIZE) + (BORDERSIZE * 2))
-#define WINHEIGHT (HEIGHT * SQUARESIZE + (BORDERSIZE * 2))
+#define FPS 60
 
 #define BOARDWIDTH WIDTH * SQUARESIZE
 #define BOARDHEIGHT HEIGHT * SQUARESIZE
@@ -15,7 +10,7 @@
 #define BARRIERLENGTH (SQUARESIZE - (BARRIEROFFSET * 2))
 #define GATETHICKNESS (BARRIERTHICKNESS / 2 + (SQUARESIZE / 64))
 
-void updatetexture(SDL_Context *ctx, Board *board);
+void updatetexture(SDL_Context *ctx, State *state);
 void rendergrid(SDL_Context *ctx);
 void renderbarriers(SDL_Context *ctx, long long *barriers);
 void rendergates(SDL_Context *ctx, short *gates);
@@ -30,37 +25,43 @@ SDL_Context *SDL_InitContext() {
                                              SDL_TEXTUREACCESS_TARGET,
                                              BOARDWIDTH, BOARDHEIGHT);
     Uint32 lastupdate = SDL_GetTicks();
+    SDL_Rect *dstrect = malloc(sizeof(SDL_Rect));
+    dstrect->x = BORDERSIZE;
+    dstrect->y = BORDERSIZE;
+    dstrect->w = BOARDWIDTH;
+    dstrect->h = BOARDHEIGHT;
 
     ctx->window = window;
     ctx->renderer = renderer;
     ctx->texture = texture;
     ctx->lastupdate = lastupdate;
+    ctx->dstrect = dstrect;
   
     return ctx;
 }
 
-void render(SDL_Context *ctx, Board *board) {
+void render(SDL_Context *ctx, State *state) {
     ctx->lastupdate = SDL_GetTicks();
     SDL_SetRenderTarget(ctx->renderer, NULL);
     SDL_SetRenderDrawColor(ctx->renderer, 0x00, 0x00, 0x00, 0xFF);
     SDL_RenderClear(ctx->renderer);
 
-    SDL_Rect dstrect = {BORDERSIZE, BORDERSIZE, BOARDWIDTH, BOARDHEIGHT};
-    updatetexture(ctx, board);
+    updatetexture(ctx, state);
     SDL_SetRenderTarget(ctx->renderer, NULL);
-    SDL_RenderCopy(ctx->renderer, ctx->texture, NULL, &dstrect);
+    SDL_RenderCopy(ctx->renderer, ctx->texture, NULL, ctx->dstrect);
 
     SDL_RenderPresent(ctx->renderer);
 }
 
-void updatetexture(SDL_Context *ctx, Board *board) {
+void updatetexture(SDL_Context *ctx, State *state) {
     SDL_SetRenderTarget(ctx->renderer, ctx->texture);
     SDL_SetRenderDrawColor(ctx->renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(ctx->renderer);
 
     rendergrid(ctx);
-    rendergates(ctx, board->gates);
-    renderbarriers(ctx, board->barriers);
+    rendergates(ctx, state->board->gates);
+    renderbarriers(ctx, state->board->barriers);
+    handlemode(ctx, state);
 }
 
 void rendergrid(SDL_Context *ctx) {
@@ -79,21 +80,25 @@ void rendergates(SDL_Context *ctx, short *gates) {
     for (i = 0; i < 16; i++) {
         SDL_SetRenderDrawColor(ctx->renderer, 0xFF, 0x00, 0x00, 0xFF);
         if (*gates & (1 << i)) {
-            SDL_Rect rect = {
-                (i % 4) * SQUARESIZE,
-                (i / 4) * SQUARESIZE,
-                SQUARESIZE,
-                SQUARESIZE
-            };
-            SDL_RenderFillRect(ctx->renderer, &rect);
-            rect.x += GATETHICKNESS;
-            rect.y += GATETHICKNESS;
-            rect.w -= GATETHICKNESS * 2;
-            rect.h -= GATETHICKNESS * 2;
-            SDL_SetRenderDrawColor(ctx->renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-            SDL_RenderFillRect(ctx->renderer, &rect);
+            rendergate(ctx, i);
         }
     }
+}
+
+void rendergate(SDL_Context *ctx, int i) {
+    SDL_Rect rect = {
+        (i % 4) * SQUARESIZE,
+        (i / 4) * SQUARESIZE,
+        SQUARESIZE,
+        SQUARESIZE
+    };
+    SDL_RenderFillRect(ctx->renderer, &rect);
+    rect.x += GATETHICKNESS;
+    rect.y += GATETHICKNESS;
+    rect.w -= GATETHICKNESS * 2;
+    rect.h -= GATETHICKNESS * 2;
+    SDL_SetRenderDrawColor(ctx->renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_RenderFillRect(ctx->renderer, &rect);
 }
 
 void renderbarriers(SDL_Context *ctx, long long *barriers) {
@@ -102,16 +107,24 @@ void renderbarriers(SDL_Context *ctx, long long *barriers) {
     int i;
     for (i = 0; i < 40; i++) {
         if (*barriers & ((long long)1 << i)) {
-            int horiz = (i % 9) < 4;
-            SDL_Rect rect;
-            rect.x = horiz ? (i % 9) * SQUARESIZE + BARRIEROFFSET : (((i % 9) - 4) % 5) * SQUARESIZE - (BARRIERTHICKNESS / 2);
-            rect.y = horiz ? (i / 9) * SQUARESIZE - (BARRIERTHICKNESS / 2) : (i / 9) * SQUARESIZE + BARRIEROFFSET;
-            rect.w = horiz ? BARRIERLENGTH : BARRIERTHICKNESS;
-            rect.h = horiz ? BARRIERTHICKNESS : BARRIERLENGTH;
-
-            SDL_RenderFillRect(ctx->renderer, &rect);
+            renderbarrier(ctx, i);
         }
     }
+}
+
+void renderbarrier(SDL_Context *ctx, int i) {
+    int horiz = (i % 9) < 4;
+    SDL_Rect rect;
+    rect.x = horiz ? (i % 9) * SQUARESIZE + BARRIEROFFSET : (((i % 9) - 4) % 5) * SQUARESIZE - (BARRIERTHICKNESS / 2);
+    rect.y = horiz ? (i / 9) * SQUARESIZE - (BARRIERTHICKNESS / 2) : (i / 9) * SQUARESIZE + BARRIEROFFSET;
+    rect.w = horiz ? BARRIERLENGTH : BARRIERTHICKNESS;
+    rect.h = horiz ? BARRIERTHICKNESS : BARRIERLENGTH;
+
+    SDL_RenderFillRect(ctx->renderer, &rect);
+}
+
+int needsupdate(Uint32 lastupdate) {
+    return (SDL_GetTicks() - lastupdate) > (1000 / FPS);
 }
 
 void cleanup(SDL_Context *ctx) {

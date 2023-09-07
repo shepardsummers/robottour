@@ -2,6 +2,7 @@
 
 void barriermode(SDL_Context *ctx, State *state);
 void gatemode(SDL_Context *ctx, State *state);
+void targetmode(SDL_Context *ctx, State *state);
 
 void handlemode(SDL_Context *ctx, State *state) {
     switch (state->mode) {
@@ -10,6 +11,9 @@ void handlemode(SDL_Context *ctx, State *state) {
             break;
         case GATE:
             gatemode(ctx, state);
+            break;
+        case TARGET:
+            targetmode(ctx, state);
             break;
         default:
             break;
@@ -46,5 +50,12 @@ void gateclick(SDL_Context *ctx, State *state) {
     } else {
         addgate(state->board->gates, g);
     }
+}
+
+void targetmode(SDL_Context *ctx, State *state) {
+    int g = getclosestsquare(state->mousepos, state->board);
+    SDL_SetRenderTarget(ctx->renderer, ctx->texture);
+    SDL_SetRenderDrawColor(ctx->renderer, 0x80, 0xF0, 0x80, 0xFF);
+    rendertarget(ctx, g);
 }
 

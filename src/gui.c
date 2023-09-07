@@ -14,6 +14,8 @@ void updatetexture(SDL_Context *ctx, State *state);
 void rendergrid(SDL_Context *ctx);
 void renderbarriers(SDL_Context *ctx, long long *barriers);
 void rendergates(SDL_Context *ctx, short *gates);
+void rendercircle(SDL_Renderer *renderer, int x0, int y0, int radius);
+void rendertarget(SDL_Context *ctx, int target);
 
 SDL_Context *SDL_InitContext() {
     SDL_Context *ctx = malloc(sizeof(SDL_Context));
@@ -61,6 +63,7 @@ void updatetexture(SDL_Context *ctx, State *state) {
     rendergrid(ctx);
     rendergates(ctx, state->board->gates);
     renderbarriers(ctx, state->board->barriers);
+    rendertarget(ctx, state->board->target);
     handlemode(ctx, state);
 }
 
@@ -122,6 +125,42 @@ void renderbarrier(SDL_Context *ctx, int i) {
 
     SDL_RenderFillRect(ctx->renderer, &rect);
 }
+
+void rendertarget(SDL_Context *ctx, int target) {
+    SDL_SetRenderDrawColor(ctx->renderer, 0x00, 0xFF, 0x00, 0xFF);
+    SDL_SetRenderTarget(ctx->renderer, ctx->texture);
+    rendercircle(ctx->renderer, (target % WIDTH) * SQUARESIZE + (SQUARESIZE / 2),
+                 (target / WIDTH) * SQUARESIZE + (SQUARESIZE / 2),
+                 (SQUARESIZE / 16));
+}
+
+void rendercircle(SDL_Renderer *renderer, int x0, int y0, int radius) {
+    int x = radius -1;
+    int y = 0;
+    int dx = 1;
+    int dy = 1;
+    int err = dx - (radius << 1);
+
+    while (x >= y) {
+        SDL_RenderDrawLine(renderer, x0 + y, y0 + x, x0 - y, y0 + x);
+        SDL_RenderDrawLine(renderer, x0 + x, y0 + y, x0 - x, y0 + y);
+        SDL_RenderDrawLine(renderer, x0 - y, y0 - x, x0 + y, y0 - x);
+        SDL_RenderDrawLine(renderer, x0 - x, y0 - y, x0 + x, y0 - y);
+
+        if (err <= 0) {
+            y++;
+            err += dy;
+            dy += 2;
+        }
+
+        if (err > 0) {
+            x--;
+            dx += 2;
+            err += dx - (radius << 1);
+        }
+    }
+}
+
 
 int needsupdate(Uint32 lastupdate) {
     return (SDL_GetTicks() - lastupdate) > (1000 / FPS);

@@ -3,7 +3,7 @@
 #define NUMBARRIERS    8
 #define NUMGATES   3
 
-#define SQUARESIZE 256
+#define SQUARESIZE 128
 #define BORDERSIZE 8
 #define WIDTH 4
 #define HEIGHT 4
@@ -21,6 +21,7 @@ typedef struct {
 typedef struct {
     long long *barriers;
     short *gates;
+    int target;
 } Board;
 
 typedef enum {
@@ -56,6 +57,7 @@ void render(SDL_Context *ctx, State *state);
 int needsupdate(Uint32 lastupdate);
 void renderbarrier(SDL_Context *ctx, int i);
 void rendergate(SDL_Context *ctx, int i);
+void rendertarget(SDL_Context *ctx, int target);
 
 void handleevents(SDL_Context *ctx, State *state);
 

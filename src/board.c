@@ -12,8 +12,10 @@ Board *newboard() {
     Board *board = malloc(sizeof(Board));
     board->barriers = malloc(sizeof(long long));
     board->gates = malloc(sizeof(short));
+    board->target = 1;
+
     *board->barriers &= 0;
-    *board->gates = 0;
+    *board->gates &= 0;
     return board;
 }
 

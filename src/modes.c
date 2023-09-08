@@ -33,6 +33,8 @@ void barriermode(SDL_Context *ctx, State *state) {
 
 void barrierclick(SDL_Context *ctx, State *state) {
     int b = getclosestbarrier(state->mousepos, state->board);
+    if (b < 0)
+        return;
     if (barrierexists(state->board->barriers, b)) {
         removebarrier(state->board->barriers, b);
     } else {
@@ -49,6 +51,8 @@ void gatemode(SDL_Context *ctx, State *state) {
 
 void gateclick(SDL_Context *ctx, State *state) {
     int g = getclosestsquare(state->mousepos, state->board);
+    if (g < 0)
+        return;
     if (gateexists(state->board->gates, g)) {
         removegate(state->board->gates, g);
     } else {
@@ -63,6 +67,8 @@ void targetmode(SDL_Context *ctx, State *state) {
 
 void targetclick(SDL_Context *ctx, State *state) {
     int g = getclosestsquare(state->mousepos, state->board);
+    if (g < 0)
+        return;
     if (state->board->target == g) {
         state->board->target = -1;
     } else {
@@ -77,6 +83,8 @@ void startmode(SDL_Context *ctx, State *state) {
 
 void startclick(SDL_Context *ctx, State *state) {
     int b = getclosestedge(state->mousepos, state->board);
+    if (b < 0)
+        return;
     if (state->board->start == b) {
         state->board->start = -1;
     } else {

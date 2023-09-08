@@ -161,7 +161,7 @@ board.o: board.c /usr/include/stdc-predef.h /usr/include/stdio.h \
  /usr/include/SDL2/SDL_render.h /usr/include/SDL2/SDL_shape.h \
  /usr/include/SDL2/SDL_system.h /usr/include/SDL2/SDL_timer.h \
  /usr/include/SDL2/SDL_version.h /usr/include/SDL2/SDL_locale.h \
- /usr/include/SDL2/SDL_misc.h
+ /usr/include/SDL2/SDL_misc.h lib.h
 /usr/include/stdc-predef.h:
 /usr/include/stdio.h:
 /usr/include/bits/libc-header-start.h:
@@ -384,3 +384,4 @@ robot.h:
 /usr/include/SDL2/SDL_version.h:
 /usr/include/SDL2/SDL_locale.h:
 /usr/include/SDL2/SDL_misc.h:
+lib.h:

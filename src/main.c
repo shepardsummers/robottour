@@ -6,6 +6,7 @@ int main() {
     state->board = newboard();
     state->mode = NORMAL;
     state->mousepos = malloc(sizeof(SDL_Point));
+    state->path = malloc(sizeof(Node));
 
     SDL_Context *ctx = SDL_InitContext();
 
@@ -23,6 +24,8 @@ int main() {
         }
         handleevents(ctx, state);
         render(ctx, state);
+
+        updatepath(state);
     }
 }
 

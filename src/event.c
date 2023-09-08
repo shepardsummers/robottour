@@ -41,6 +41,9 @@ void handleevent(SDL_Context *ctx, State *state, SDL_Event *event) {
                     case SDLK_s:
                         state->mode = START;
                         break;
+                    case SDLK_p:
+                        togglepath(state);
+                        break;
                 }
                 break;
             case SDL_MOUSEBUTTONDOWN:

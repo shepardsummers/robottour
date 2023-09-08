@@ -6,16 +6,16 @@
 #define BARRIEROFFSET (SQUARESIZE / 16)
 #define BARRIERLENGTH (SQUARESIZE - (BARRIEROFFSET * 2))
 #define GATETHICKNESS (BARRIERTHICKNESS / 2 + (SQUARESIZE / 64))
-
 #define POINTSIZE (SQUARESIZE / 16)
 
 void updatetexture(SDL_Context *ctx, State *state);
 void rendergrid(SDL_Context *ctx);
 void renderbarriers(SDL_Context *ctx, long long *barriers);
-void rendergates(SDL_Context *ctx, short *gates);
+void rendergates(SDL_Context *ctx, unsigned short *gates);
 void rendercircle(SDL_Renderer *renderer, int x0, int y0, int radius);
 void rendertarget(SDL_Context *ctx, int target);
 void renderstart(SDL_Context *ctx, int start);
+void renderpath(SDL_Context *ctx, State *state, Node *path);
 
 SDL_Context *SDL_InitContext() {
     SDL_Context *ctx = malloc(sizeof(SDL_Context));
@@ -65,6 +65,8 @@ void updatetexture(SDL_Context *ctx, State *state) {
     renderbarriers(ctx, state->board->barriers);
     rendertarget(ctx, state->board->target);
     renderstart(ctx, state->board->start);
+    if (state->pathactive)
+        renderpath(ctx, state, state->path);
     handlemode(ctx, state);
 }
 
@@ -78,7 +80,7 @@ void rendergrid(SDL_Context *ctx) {
     }
 }
 
-void rendergates(SDL_Context *ctx, short *gates) {
+void rendergates(SDL_Context *ctx, unsigned short *gates) {
     SDL_SetRenderTarget(ctx->renderer, ctx->texture);
     int i;
     for (i = 0; i < 16; i++) {
@@ -142,16 +144,37 @@ void renderstart(SDL_Context *ctx, int start) {
         return;
     SDL_SetRenderDrawColor(ctx->renderer, 0x00, 0xFF, 0x00, 0xFF);
     SDL_SetRenderTarget(ctx->renderer, ctx->texture);
-    int x, y, horiz;
-    horiz = (start % 9) < 4;
-    if (horiz) {
-        x = (start % 9) * SQUARESIZE + (SQUARESIZE / 2);
-        y = (start / 9) * SQUARESIZE;
-    } else {
-        x = (((start % 9) - 4) % 5) * SQUARESIZE;
-        y = (start / 9) * SQUARESIZE + (SQUARESIZE / 2);
+    SDL_Point p = getstartcoords(start);
+    rendercircle(ctx->renderer, p.x, p.y, POINTSIZE);
+}
+
+void renderpath(SDL_Context *ctx, State *state, Node *path) {
+    if (!path)
+        return;
+
+    SDL_SetRenderDrawColor(ctx->renderer, 0x00, 0xFF, 0x00, 0xFF);
+    SDL_SetRenderTarget(ctx->renderer, ctx->texture);
+
+    Node *node = path;
+    int x1, y1, x2, y2;
+    x2 = (node->data % WIDTH) * SQUARESIZE + (SQUARESIZE / 2);
+    y2 = (node->data / WIDTH) * SQUARESIZE + (SQUARESIZE / 2);
+    
+    node = node->parent;
+    while (node) {
+        x1 = x2;
+        y1 = y2;
+        x2 = (node->data % WIDTH) * SQUARESIZE + (SQUARESIZE / 2);
+        y2 = (node->data / WIDTH) * SQUARESIZE + (SQUARESIZE / 2);
+        SDL_RenderDrawLine(ctx->renderer, x1, y1, x2, y2);
+        node = node->parent;
     }
-    rendercircle(ctx->renderer, x, y, POINTSIZE);
+    SDL_Point p = getstartcoords(state->board->start);
+    SDL_RenderDrawLine(ctx->renderer, x2, y2, p.x, p.y);
+}
+
+void togglepath(State *state) {
+    state->pathactive = !state->pathactive;
 }
 
 void rendercircle(SDL_Renderer *renderer, int x0, int y0, int radius) {

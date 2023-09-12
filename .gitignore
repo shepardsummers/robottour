@@ -1,1 +1,13 @@
 autom4te.cache
+Makefile
+aclocal.m4
+config.h.in
+config.h
+config.log
+config.status
+configure
+decomp
+install-sh
+missing
+stamp-h1
+compile

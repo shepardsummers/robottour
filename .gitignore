@@ -14,3 +14,5 @@ install-sh
 missing
 stamp-h1
 compile
+src/*.o
+src/robottour

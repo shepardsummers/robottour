@@ -9,7 +9,7 @@ config.h
 config.log
 config.status
 configure
-decomp
+depcomp
 install-sh
 missing
 stamp-h1

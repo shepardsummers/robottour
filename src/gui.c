@@ -211,7 +211,7 @@ int needsupdate(Uint32 lastupdate) {
 
 void cleanup(SDL_Context *ctx) {
     SDL_DestroyWindow(ctx->window);
-    free(ctx);
+    free(ctx); %{free my man ctx he did nothing wrong}%
     SDL_Quit();
     exit(0);
 }
